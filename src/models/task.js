@@ -6,15 +6,34 @@ const pool = new Pool({
 });
 
 class Task {
-  static async createTask({ userId, title, description, dueDate, priority, status }) {
+  static async createTask({ userId, title, flagged = false, status = 'todo' }) {
     const query = `
-      INSERT INTO tasks (user_id, title, description, due_date, priority, status)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO tasks (user_id, title, flagged, status)
+      VALUES ($1, $2, $3, $4)
       RETURNING *
     `;
-    const values = [userId, title, description, dueDate, priority, status];
+    const values = [userId, title, flagged, status];
     const { rows } = await pool.query(query, values);
     return rows[0];
+  }
+
+  static async createExampleTasks(userId) {
+    const exampleTasks = [
+      { title: 'Welcome to Hang! 👋', flagged: false, status: 'todo' },
+      { title: 'Try marking this task as done', flagged: false, status: 'todo' },
+      { title: 'Important task (flagged)', flagged: true, status: 'todo' }
+    ];
+
+    const tasks = [];
+    for (const task of exampleTasks) {
+      const newTask = await this.createTask({
+        userId,
+        ...task
+      });
+      tasks.push(newTask);
+    }
+
+    return tasks;
   }
 
   static async getTasksByUserId(userId) {
@@ -24,7 +43,7 @@ class Task {
   }
 
   static async updateTask(taskId, userId, updates) {
-    const allowedUpdates = ['title', 'description', 'due_date', 'priority', 'status'];
+    const allowedUpdates = ['title', 'flagged', 'status'];
     const updateFields = Object.keys(updates)
       .filter(key => allowedUpdates.includes(key))
       .map(key => `${key} = $${allowedUpdates.indexOf(key) + 3}`)
@@ -32,7 +51,7 @@ class Task {
 
     const query = `
       UPDATE tasks
-      SET ${updateFields}, updated_at = CURRENT_TIMESTAMP
+      SET ${updateFields}
       WHERE id = $1 AND user_id = $2
       RETURNING *
     `;
