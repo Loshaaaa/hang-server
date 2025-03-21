@@ -7,8 +7,11 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Drop existing tasks table if it exists
+DROP TABLE IF EXISTS tasks;
+
 -- Create tasks table
-CREATE TABLE IF NOT EXISTS tasks (
+CREATE TABLE tasks (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
@@ -17,7 +20,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create index for faster queries
-CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id);
-CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
-CREATE INDEX IF NOT EXISTS idx_tasks_flagged ON tasks(flagged); 
+-- Create indexes for faster queries
+CREATE INDEX idx_tasks_user_id ON tasks(user_id);
+CREATE INDEX idx_tasks_status ON tasks(status);
+CREATE INDEX idx_tasks_flagged ON tasks(flagged); 
