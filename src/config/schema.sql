@@ -19,4 +19,5 @@ CREATE TABLE IF NOT EXISTS tasks (
 
 -- Create index for faster queries
 CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id);
-CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status); 
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_flagged ON tasks(flagged); 
